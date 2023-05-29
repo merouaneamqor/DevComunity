@@ -1,10 +1,8 @@
-tap 'elastic/tap'
-
-brew 'elastic/tap/elasticsearch-full'
+brew 'opensearch'
 brew 'imagemagick'
-brew 'postgresql'
+brew 'postgresql@15'
 brew 'node'
 brew 'redis'
-brew 'minio/stable/minio'
+brew 'minio'
 
 cask 'chromedriver'

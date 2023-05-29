@@ -17,7 +17,7 @@ describe "Posts", type: :request do
         expect(response).to have_http_status(200)
         expect(response.content_type).to eq('application/json; charset=utf-8')
 
-        json_data = JSON.parse(response.body)
+        json_data = response.parsed_body
         expect(json_data.length).to eq(2)
 
         posts = json_data['posts']
@@ -37,7 +37,7 @@ describe "Posts", type: :request do
         expect(response).to have_http_status(200)
         expect(response.content_type).to eq('application/json; charset=utf-8')
 
-        json_data = JSON.parse(response.body)
+        json_data = response.parsed_body
         expect(json_data.length).to eq(2)
 
         posts = json_data['posts']
@@ -56,7 +56,7 @@ describe "Posts", type: :request do
         expect(response).to have_http_status(200)
         expect(response.content_type).to eq('application/json; charset=utf-8')
 
-        json_data = JSON.parse(response.body)
+        json_data = response.parsed_body
         expect(json_data).to eq(%w[lorem])
       end
     end
@@ -67,7 +67,7 @@ describe "Posts", type: :request do
         expect(response).to have_http_status(200)
         expect(response.content_type).to eq('application/json; charset=utf-8')
 
-        json_data = JSON.parse(response.body)
+        json_data = response.parsed_body
         expect(json_data).to eq(%w[])
       end
     end
@@ -79,7 +79,7 @@ describe "Posts", type: :request do
       expect(response).to have_http_status(200)
       expect(response.content_type).to eq('application/json; charset=utf-8')
 
-      json_data = JSON.parse(response.body)
+      json_data = response.parsed_body
 
       post = json_data['post']
       expect(post.keys).to match_array(%w[id slug title content copyright created_at updated_at clips_count clips])
@@ -108,13 +108,13 @@ describe "Posts", type: :request do
       let(:headers) { authenticated_header(admin_user) }
 
       it "creates new post" do
-        post api_v1_posts_path, params: params, headers: headers
+        post(api_v1_posts_path, params:, headers:)
 
         expect(response).to have_http_status(201)
         expect(response.content_type).to eq('application/json; charset=utf-8')
         expect(response.location).to eq('http://www.example.com/posts/this-is-a-new-post')
 
-        json_data = JSON.parse(response.body)
+        json_data = response.parsed_body
         post = json_data['post']
         expect(post.keys).to match_array(%w[id slug title content copyright created_at updated_at clips_count clips])
         expect(post['title']).to eq('This is a new post')
@@ -125,7 +125,7 @@ describe "Posts", type: :request do
     context "without admin authentication" do
       it "rejects creating post" do
         [ normal_user, nil, :invalid ].each do |auth_target|
-          post api_v1_posts_path, params: params, headers: authenticated_header(auth_target)
+          post(api_v1_posts_path, params:, headers: authenticated_header(auth_target))
 
           expect(response).to have_http_status(401)
         end
@@ -144,7 +144,7 @@ describe "Posts", type: :request do
 
     context "authenticated as admin" do
       it "updates post" do
-        patch api_v1_post_path(id: 42), params: params, headers: authenticated_header(admin_user)
+        patch(api_v1_post_path(id: 42), params:, headers: authenticated_header(admin_user))
 
         expect(response).to have_http_status(200)
         expect(post1.reload.title).to eq('other title')
@@ -154,7 +154,7 @@ describe "Posts", type: :request do
     context "without admin authentication" do
       it "rejects updating post" do
         [ normal_user, nil, :invalid ].each do |auth_target|
-          patch api_v1_post_path(id: 42), params: params, headers: authenticated_header(auth_target)
+          patch(api_v1_post_path(id: 42), params:, headers: authenticated_header(auth_target))
 
           expect(response).to have_http_status(401)
           expect(post1.reload.title).to eq('Foo')

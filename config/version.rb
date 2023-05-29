@@ -29,14 +29,14 @@ module DockerRails
     end
 
     def redis_version
-      Sidekiq.redis_info['redis_version']
+      Redis.new(url: ENV.fetch('REDIS_SIDEKIQ_URL', nil)).info['redis_version']
     end
 
     def postgresql_version
       ActiveRecord::Base.connection.select_value('SHOW server_version;')
     end
 
-    def elasticsearch_version
+    def opensearch_version
       Searchkick.server_version
     end
   end
